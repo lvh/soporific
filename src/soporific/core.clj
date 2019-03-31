@@ -14,12 +14,13 @@
        (into {}
              (comp
               (filter #(.isFile %))
-              (map (juxt
-                    (fn [f] (-> f
-                                (.getName)
-                                (str/split #"\." 1)
-                                (first)))
-                    (comp h/as-hickory h/parse slurp)))))))
+              (map
+               (fn [f]
+                 (let [friendly (-> f (.getName) (str/split #"\." 1) (first))
+                       contents (slurp f)]
+                   [friendly
+                    {::contents contents
+                     ::hickory (-> contents h/parse h/as-hickory)}])))))))
 
 (defonce parsed-rfcs (parse-rfcs rfcdash-base-path))
 
